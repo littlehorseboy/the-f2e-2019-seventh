@@ -40,21 +40,39 @@ export default function Login(): JSX.Element {
 
   return (
     <div className={classes.root}>
-      <div className={classes.choiceContainer}>
-        <Button color="secondary">[匿名聊天]</Button>
-        <Button color="primary">[暱稱聊天]</Button>
-      </div>
-      <div className={classes.choiceContainer}>
-        <Typography className={classes.title}>暱稱聊天</Typography>
-        <TextField
-          placeholder="輸入暱稱"
-        />
-        <Button color="primary">[確定]</Button>
-      </div>
-      <div className={classes.choiceContainer}>
-        <Button color="primary">[隨機配對1對1聊天]</Button>
-        <Button color="primary">[進入聊天大廳]</Button>
-      </div>
+      {isAnonymous === null && (
+        <div className={classes.choiceContainer}>
+          <Button
+            color="secondary"
+            onClick={(): void => setIsAnonymous(true)}
+          >
+            [匿名聊天]
+          </Button>
+          <Button
+            color="primary"
+            onClick={(): void => setIsAnonymous(false)}
+          >
+            [暱稱聊天]
+          </Button>
+        </div>
+      )}
+
+      {isAnonymous === false && (
+        <div className={classes.choiceContainer}>
+          <Typography className={classes.title}>暱稱聊天</Typography>
+          <TextField
+            placeholder="輸入暱稱"
+          />
+          <Button color="primary">[確定]</Button>
+        </div>
+      )}
+
+      {isAnonymous === true && (
+        <div className={classes.choiceContainer}>
+          <Button color="primary">[隨機配對1對1聊天]</Button>
+          <Button color="primary">[進入聊天大廳]</Button>
+        </div>
+      )}
     </div>
   );
 }
