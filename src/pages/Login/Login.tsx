@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
@@ -100,7 +101,9 @@ export default function Login(): JSX.Element {
       {(isAnonymous === true || name !== 'anonymous') && (
         <div className={classes.choiceContainer}>
           <Button color="primary">[隨機配對1對1聊天]</Button>
-          <Button color="primary">[進入聊天大廳]</Button>
+          <Link to="/chatRoom">
+            <Button color="primary">[進入聊天大廳]</Button>
+          </Link>
         </div>
       )}
     </div>

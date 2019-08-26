@@ -6,12 +6,14 @@ import ChatRoomsPage from '../pages/ChatRoomsPage/ChatRoomsPage';
 
 const routes = [
   { path: '/login', name: 'login', Component: Login },
+  { path: '/chatRoom', name: 'chatRoom', Component: ChatRoomsPage },
   { path: '/chatRoom/:id', name: 'chatRoom', Component: ChatRoomsPage },
 ];
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const useStyles = makeStyles(() => createStyles({
   root: {
+    fontFamily: 'Consolas, Regular, system-ui, -apple-system, "Roboto", "Helvetica", "Arial", sans-serif',
     backgroundColor: '#1E1E1E',
     minHeight: '100vh',
     color: '#D4D4D4',
