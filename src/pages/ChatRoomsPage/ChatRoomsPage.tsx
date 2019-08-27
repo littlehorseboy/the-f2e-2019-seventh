@@ -5,10 +5,15 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import SearchIcon from '@material-ui/icons/Search';
 import UsersSvgIcon from '../../components/icons/UsersSvgIcon/UsersSvgIcon';
+import AddChatRoomButton from '../../components/AddChatRoomButton/AddChatRoomButton';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const useStyles = makeStyles((theme) => createStyles({
@@ -54,6 +59,7 @@ const useStyles = makeStyles((theme) => createStyles({
     height: 'calc(100% - 72px - 52px)',
   },
   buttonContainer: {
+    textAlign: 'center',
     paddingLeft: theme.spacing(1.5),
     paddingRight: theme.spacing(1.5),
     '& > button': {
@@ -75,11 +81,45 @@ const useStyles = makeStyles((theme) => createStyles({
       paddingBottom: theme.spacing(),
     },
     '& fieldset.MuiOutlinedInput-notchedOutline': {
-      borderRadius: 16,
+      borderRadius: 20,
+    },
+  },
+  chatRoomsContainer: {
+    '& > div:nth-child(1)': {
+      backgroundColor: '#414141',
+      padding: theme.spacing(1, 3),
+    },
+    '& > div:nth-child(2)': {
+      overflowY: 'auto',
+      height: 240,
+      '& div.MuiButtonBase-root': {
+        paddingTop: 0,
+        paddingBottom: 0,
+      },
+      '& div.MuiListItemText-root > span': {
+        fontSize: '0.8rem',
+      },
     },
   },
   newChatRoomContainer: {
     padding: theme.spacing(),
+  },
+  mainButtonContainer: {
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    '& > div': {
+      textAlign: 'center',
+      '& > div': {
+        marginTop: theme.spacing(),
+        marginBottom: theme.spacing(),
+        '& > button': {
+          borderRadius: 0,
+        },
+      },
+    },
   },
 }));
 
@@ -93,6 +133,24 @@ export default function ChatRoomsPage(): JSX.Element {
   const handleChangeSearchString = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setSearchString(event.target.value);
   };
+
+  /* eslint-disable object-curly-newline */
+  const [chatRooms, setChatRooms] = useState([
+    { id: 1, name: '聊天室名字1', MaxPeople: 2, password: null, private: false },
+    { id: 2, name: '聊天室名字2', MaxPeople: 2, password: null, private: false },
+    { id: 3, name: '聊天室名字3', MaxPeople: 2, password: null, private: false },
+    { id: 4, name: '聊天室名字4', MaxPeople: 2, password: null, private: false },
+    { id: 5, name: '聊天室名字5', MaxPeople: 2, password: null, private: false },
+    { id: 6, name: '聊天室名字6', MaxPeople: 2, password: null, private: false },
+    { id: 7, name: '聊天室名字7', MaxPeople: 2, password: null, private: false },
+    { id: 8, name: '聊天室名字8', MaxPeople: 2, password: null, private: false },
+    { id: 9, name: '聊天室名字9', MaxPeople: 2, password: null, private: false },
+  ]);
+  /* eslint-enable */
+
+  const [recentChatRooms, setRecentChatRooms] = useState([]);
+
+  const [openChatRooms, setOpenChatRooms] = useState([]);
 
   return (
     <div className={classes.root}>
@@ -170,84 +228,154 @@ export default function ChatRoomsPage(): JSX.Element {
                 />
               </div>
 
-              <div>公開聊天室</div>
-              <div style={{ overflowY: 'auto', height: 240 }}>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
+              <div className={classes.chatRoomsContainer}>
+                <div>公開聊天室(10)</div>
+                <List component="div">
+                  <ListItem button>
+                    <ListItemText primary="聊天室名字" />
+                    <ListItemSecondaryAction>
+                      1 / 2
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem button>
+                    <ListItemText primary="聊天室名字" />
+                    <ListItemSecondaryAction>
+                      1 / 2
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem button>
+                    <ListItemText primary="聊天室名字" />
+                    <ListItemSecondaryAction>
+                      1 / 2
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem button>
+                    <ListItemText primary="聊天室名字" />
+                    <ListItemSecondaryAction>
+                      1 / 2
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem button>
+                    <ListItemText primary="聊天室名字" />
+                    <ListItemSecondaryAction>
+                      1 / 2
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem button>
+                    <ListItemText primary="聊天室名字" />
+                    <ListItemSecondaryAction>
+                      1 / 2
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem button>
+                    <ListItemText primary="聊天室名字" />
+                    <ListItemSecondaryAction>
+                      1 / 2
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem button>
+                    <ListItemText primary="聊天室名字" />
+                    <ListItemSecondaryAction>
+                      1 / 2
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem button>
+                    <ListItemText primary="聊天室名字" />
+                    <ListItemSecondaryAction>
+                      1 / 2
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                </List>
               </div>
 
-              <div>最近加入的聊天室</div>
-              <div style={{ overflowY: 'auto', height: 240 }}>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
-                <div>123</div>
+              <div className={classes.chatRoomsContainer}>
+                <div>最近加入的聊天室(19)</div>
+                <List component="div">
+                  <ListItem button>
+                    <ListItemText primary="聊天室名字" />
+                    <ListItemSecondaryAction>
+                      1 / 2
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem button>
+                    <ListItemText primary="聊天室名字" />
+                    <ListItemSecondaryAction>
+                      1 / 2
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem button>
+                    <ListItemText primary="聊天室名字" />
+                    <ListItemSecondaryAction>
+                      1 / 2
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem button>
+                    <ListItemText primary="聊天室名字" />
+                    <ListItemSecondaryAction>
+                      1 / 2
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem button>
+                    <ListItemText primary="聊天室名字" />
+                    <ListItemSecondaryAction>
+                      1 / 2
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem button>
+                    <ListItemText primary="聊天室名字" />
+                    <ListItemSecondaryAction>
+                      1 / 2
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem button>
+                    <ListItemText primary="聊天室名字" />
+                    <ListItemSecondaryAction>
+                      1 / 2
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem button>
+                    <ListItemText primary="聊天室名字" />
+                    <ListItemSecondaryAction>
+                      1 / 2
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                </List>
               </div>
             </div>
 
             <div className={classes.newChatRoomContainer}>
-              <Button
-                color="primary"
-                variant="outlined"
-                fullWidth
-              >
-                新增聊天室
-              </Button>
+              <AddChatRoomButton />
             </div>
           </>
         )}
       </div>
 
       <div className={classes.main}>
-        <div>
-          <div>ヽ(✿ﾟ▽ﾟ)ノ</div>
-          <div>馬上開始你的聊天吧~</div>
+        <div className={classes.mainButtonContainer}>
           <div>
-            <Button
-              color="primary"
-              variant="outlined"
-              fullWidth
-            >
-              隨機1對1配對
-            </Button>
-          </div>
-          <div>
-            <Button
-              color="primary"
-              variant="outlined"
-              fullWidth
-            >
-              隨機進入群組
-            </Button>
-          </div>
-          <div>
-            <Button
-              color="primary"
-              variant="outlined"
-              fullWidth
-            >
-              新增聊天室
-            </Button>
+            <div>ヽ(✿ﾟ▽ﾟ)ノ</div>
+            <div>馬上開始你的聊天吧~</div>
+            <div>
+              <Button
+                color="primary"
+                variant="outlined"
+                fullWidth
+              >
+                隨機1對1配對
+              </Button>
+            </div>
+            <div>
+              <Button
+                color="primary"
+                variant="outlined"
+                fullWidth
+              >
+                隨機進入群組
+              </Button>
+            </div>
+            <div>
+              <AddChatRoomButton />
+            </div>
           </div>
         </div>
       </div>
