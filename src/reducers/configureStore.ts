@@ -2,10 +2,12 @@ import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { createLogger } from 'redux-logger';
 import isLoadingReducer from './isLoading/isLoading';
 import loginReducer from './login/login';
+import chatRoomsReducer from './chatRooms/chatRooms';
 
 const rootReducer = combineReducers({
   isLoadingReducer,
   loginReducer,
+  chatRoomsReducer,
 });
 
 const loggerMiddleware = createLogger();
