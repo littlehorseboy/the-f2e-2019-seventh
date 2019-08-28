@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
@@ -40,6 +40,13 @@ const useStyles = makeStyles((theme) => createStyles({
 export default function Login(): JSX.Element {
   const classes = useStyles();
 
+  const dispatch = useDispatch();
+
+  useEffect((): void => {
+    // 還原為預設值
+    dispatch(setName('anonymous'));
+  }, []);
+
   const [isAnonymous, setIsAnonymous] = useState<null | boolean>(null);
 
   const [fieldName, setFieldName] = useState('');
@@ -51,8 +58,6 @@ export default function Login(): JSX.Element {
   const name = useSelector((
     state: storeTypes,
   ): string => state.loginReducer.name);
-
-  const dispatch = useDispatch();
 
   const handleClickSetName = (): void => {
     if (!fieldName) {
