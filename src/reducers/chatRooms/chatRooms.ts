@@ -9,11 +9,6 @@ interface ChatRoomsI {
     isPrivate: boolean;
     upperLimit: number;
     people: string[];
-    messages: {
-      order: number;
-      spokesman: string;
-      message: string;
-    }[];
   }[];
 }
 
@@ -24,11 +19,32 @@ const initState: ChatRoomsI = {
       name: '',
       password: '',
       isPrivate: false,
-      upperLimit: 10,
-      people: ['Arial'],
-      messages: [
-        { order: 1, spokesman: 'Arial', message: '' },
-      ],
+      upperLimit: 2,
+      people: ['Frank Baker'],
+    },
+    {
+      id: 2,
+      name: '',
+      password: '',
+      isPrivate: false,
+      upperLimit: 2,
+      people: ['Alissa Middleton'],
+    },
+    {
+      id: 3,
+      name: '',
+      password: '',
+      isPrivate: false,
+      upperLimit: 2,
+      people: ['Bonnie Garrix'],
+    },
+    {
+      id: 4,
+      name: '',
+      password: '',
+      isPrivate: false,
+      upperLimit: 2,
+      people: ['Eddie Middleton'],
     },
   ],
 };
@@ -48,7 +64,6 @@ const reducer = (state = initState, action: chatRoomsActionTypes): ChatRoomsI =>
             isPrivate: action.payload.isPrivate,
             upperLimit: action.payload.upperLimit,
             people: action.payload.people,
-            messages: [],
           },
         ],
       };
