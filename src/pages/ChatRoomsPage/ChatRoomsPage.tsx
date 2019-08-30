@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import classNames from 'classnames';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
@@ -14,6 +15,8 @@ import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import SearchIcon from '@material-ui/icons/Search';
 import UsersSvgIcon from '../../components/icons/UsersSvgIcon/UsersSvgIcon';
 import AddChatRoomButton from '../../components/AddChatRoomButton/AddChatRoomButton';
+import { storeTypes } from '../../reducers/configureStore';
+import { ChatRoomsI } from '../../reducers/chatRooms/chatRooms';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const useStyles = makeStyles((theme) => createStyles({
@@ -134,19 +137,9 @@ export default function ChatRoomsPage(): JSX.Element {
     setSearchString(event.target.value);
   };
 
-  /* eslint-disable object-curly-newline */
-  const [chatRooms, setChatRooms] = useState([
-    { id: 1, name: '聊天室名字1', MaxPeople: 2, password: null, private: false },
-    { id: 2, name: '聊天室名字2', MaxPeople: 2, password: null, private: false },
-    { id: 3, name: '聊天室名字3', MaxPeople: 2, password: null, private: false },
-    { id: 4, name: '聊天室名字4', MaxPeople: 2, password: null, private: false },
-    { id: 5, name: '聊天室名字5', MaxPeople: 2, password: null, private: false },
-    { id: 6, name: '聊天室名字6', MaxPeople: 2, password: null, private: false },
-    { id: 7, name: '聊天室名字7', MaxPeople: 2, password: null, private: false },
-    { id: 8, name: '聊天室名字8', MaxPeople: 2, password: null, private: false },
-    { id: 9, name: '聊天室名字9', MaxPeople: 2, password: null, private: false },
-  ]);
-  /* eslint-enable */
+  const chatRooms = useSelector((
+    state: storeTypes,
+  ): ChatRoomsI['chatRooms'] => state.chatRoomsReducer.chatRooms);
 
   const [recentChatRooms, setRecentChatRooms] = useState([]);
 
@@ -231,60 +224,14 @@ export default function ChatRoomsPage(): JSX.Element {
               <div className={classes.chatRoomsContainer}>
                 <div>公開聊天室(10)</div>
                 <List component="div">
-                  <ListItem button>
-                    <ListItemText primary="聊天室名字" />
-                    <ListItemSecondaryAction>
-                      1 / 2
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="聊天室名字" />
-                    <ListItemSecondaryAction>
-                      1 / 2
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="聊天室名字" />
-                    <ListItemSecondaryAction>
-                      1 / 2
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="聊天室名字" />
-                    <ListItemSecondaryAction>
-                      1 / 2
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="聊天室名字" />
-                    <ListItemSecondaryAction>
-                      1 / 2
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="聊天室名字" />
-                    <ListItemSecondaryAction>
-                      1 / 2
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="聊天室名字" />
-                    <ListItemSecondaryAction>
-                      1 / 2
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="聊天室名字" />
-                    <ListItemSecondaryAction>
-                      1 / 2
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="聊天室名字" />
-                    <ListItemSecondaryAction>
-                      1 / 2
-                    </ListItemSecondaryAction>
-                  </ListItem>
+                  {chatRooms.map((chatRoom): JSX.Element => (
+                    <ListItem key={chatRoom.id} button>
+                      <ListItemText primary={chatRoom.name} />
+                      <ListItemSecondaryAction>
+                        {`${chatRoom.people.length} / ${chatRoom.upperLimit}`}
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  ))}
                 </List>
               </div>
 

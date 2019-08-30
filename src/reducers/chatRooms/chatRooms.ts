@@ -1,7 +1,7 @@
 import maxBy from 'lodash/maxBy';
 import { chatRoomsActionTypes, ADDCHATROOM } from '../../actions/chatRooms/chatRooms';
 
-interface ChatRoomsI {
+export interface ChatRoomsI {
   chatRooms: {
     id: number;
     name: string;
@@ -16,35 +16,91 @@ const initState: ChatRoomsI = {
   chatRooms: [
     {
       id: 1,
-      name: '',
+      name: '我現在非常懶惰',
       password: '',
       isPrivate: false,
       upperLimit: 2,
-      people: ['Frank Baker'],
+      people: ['Baker'],
     },
     {
       id: 2,
-      name: '',
+      name: '亞馬遜大火到底是為什麼!?',
       password: '',
       isPrivate: false,
       upperLimit: 2,
-      people: ['Alissa Middleton'],
+      people: ['Emma'],
     },
     {
       id: 3,
-      name: '',
+      name: '求動漫愛好，不是H漫啦',
       password: '',
       isPrivate: false,
       upperLimit: 2,
-      people: ['Bonnie Garrix'],
+      people: ['Mike'],
     },
     {
       id: 4,
-      name: '',
+      name: '非洲豬瘟',
       password: '',
       isPrivate: false,
       upperLimit: 2,
-      people: ['Eddie Middleton'],
+      people: ['Willy'],
+    },
+    {
+      id: 5,
+      name: '動得很厲害',
+      password: '',
+      isPrivate: false,
+      upperLimit: 2,
+      people: ['Kenny'],
+    },
+    {
+      id: 6,
+      name: '最近的香港...',
+      password: '',
+      isPrivate: false,
+      upperLimit: 2,
+      people: ['Nerissa'],
+    },
+    {
+      id: 7,
+      name: '鬼門關',
+      password: '',
+      isPrivate: false,
+      upperLimit: 2,
+      people: ['Nerissa'],
+    },
+    {
+      id: 8,
+      name: '極端氣候我們該怎麼辦?',
+      password: '',
+      isPrivate: false,
+      upperLimit: 2,
+      people: ['John'],
+    },
+    {
+      id: 9,
+      name: '5G競標底價300億貴不貴?',
+      password: '',
+      isPrivate: false,
+      upperLimit: 2,
+      people: ['Lucy'],
+    },
+    {
+      id: 10,
+      name: '最近機車外送很夯',
+      password: '',
+      isPrivate: false,
+      upperLimit: 2,
+      people: ['Louis'],
+    },
+    {
+      id: 11,
+      name: '有人想要一起去淨灘嗎?',
+      password: '',
+      isPrivate: false,
+      upperLimit: 2,
+      people: ['Louis'],
     },
   ],
 };
@@ -57,6 +113,7 @@ const reducer = (state = initState, action: chatRoomsActionTypes): ChatRoomsI =>
     case ADDCHATROOM:
       return {
         chatRooms: [
+          ...state.chatRooms,
           {
             id: newId,
             name: action.payload.name,

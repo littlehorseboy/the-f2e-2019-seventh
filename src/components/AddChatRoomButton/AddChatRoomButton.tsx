@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -7,6 +10,8 @@ import OutlinedInput from '@material-ui/core/OutlinedInput';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
+import { addChatRoom } from '../../actions/chatRooms/chatRooms';
+import { storeTypes } from '../../reducers/configureStore';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const useStyles = makeStyles((theme) => createStyles({
@@ -17,11 +22,11 @@ const useStyles = makeStyles((theme) => createStyles({
   dialogContainer: {
     padding: theme.spacing(3, 6),
     color: '#D4D4D4',
-    '& > h2:first-child': {
+    '& > form > h2:first-child': {
       color: '#9CDCFE',
       textAlign: 'center',
     },
-    '& > div': {
+    '& > form > div': {
       display: 'flex',
       alignItems: 'center',
     },
@@ -55,6 +60,12 @@ const useStyles = makeStyles((theme) => createStyles({
   },
 }));
 
+const UASCatalogSchema = Yup.object().shape({
+  name: Yup.string()
+    .required('必填'),
+});
+
+
 export default function AddChatRoomButton(): JSX.Element {
   const classes = useStyles();
 
@@ -67,6 +78,12 @@ export default function AddChatRoomButton(): JSX.Element {
   function handleClose(): void {
     setOpen(false);
   }
+
+  const name = useSelector((
+    state: storeTypes,
+  ): string => state.loginReducer.name);
+
+  const dispatch = useDispatch();
 
   return (
     <>
@@ -87,75 +104,134 @@ export default function AddChatRoomButton(): JSX.Element {
         }}
       >
         <div className={classes.dialogContainer}>
-          <h2>新增聊天室</h2>
-          <TextField
-            placeholder="聊天室名稱"
-            fullWidth
-            margin="dense"
-          />
-          <div>
-            限制
-            <FormControl variant="outlined" margin="dense" className={classes.formControl}>
-              <Select
-                native
-                classes={{
-                  root: classes.muiSelectRoot,
-                  icon: classes.muiSelectIcon,
-                }}
-                value={12}
-                // onChange={handleChange('age')}
-                input={(
-                  <OutlinedInput
-                    labelWidth={0}
-                    classes={{ notchedOutline: classes.muiOutlined }}
+          <Formik
+            initialValues={{
+              name: '',
+              upperLimit: 2,
+              checked: false,
+              password: '',
+              isPrivate: 0,
+            }}
+            validationSchema={UASCatalogSchema}
+            onSubmit={(values, actions): void => {
+              dispatch(addChatRoom(
+                values.name,
+                values.checked ? values.password : '',
+                values.isPrivate === 1,
+                values.upperLimit,
+                [name],
+              ));
+              actions.setSubmitting(false);
+              handleClose();
+            }}
+          >
+            {({
+              values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting,
+              setFieldValue,
+            }): JSX.Element => (
+              <form onSubmit={handleSubmit}>
+                <h2>新增聊天室</h2>
+
+                <TextField
+                  placeholder="聊天室名稱"
+                  name="name"
+                  value={values.name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  helperText={errors.name && touched.name && errors.name}
+                  error={!!(errors.name && touched.name && errors.name)}
+                  fullWidth
+                  margin="dense"
+                />
+
+                <div>
+                  限制
+                  <FormControl variant="outlined" margin="dense" className={classes.formControl}>
+                    <Select
+                      native
+                      classes={{
+                        root: classes.muiSelectRoot,
+                        icon: classes.muiSelectIcon,
+                      }}
+                      name="upperLimit"
+                      value={values.upperLimit}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={!!(errors.upperLimit && touched.upperLimit && errors.upperLimit)}
+                      input={(
+                        <OutlinedInput
+                          id="outlined-input"
+                          labelWidth={0}
+                          classes={{ notchedOutline: classes.muiOutlined }}
+                        />
+                      )}
+                    >
+                      <option value={2}>2</option>
+                      <option value={3}>3</option>
+                      <option value={4}>4</option>
+                      <option value={5}>5</option>
+                    </Select>
+                  </FormControl>
+                  人
+                  <span>(上限5人)</span>
+                </div>
+                <div>
+                  <Checkbox
+                    className={classes.muiCheckbox}
+                    name="checked"
+                    value={values.checked}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
                   />
-                )}
-              >
-                <option value={1}>1</option>
-                <option value={2}>2</option>
-                <option value={3}>3</option>
-              </Select>
-            </FormControl>
-            人
-            <span>(上限10人)</span>
-          </div>
-          <div>
-            <Checkbox
-              className={classes.muiCheckbox}
-            />
-            設密碼
-            <TextField
-              placeholder="XXXX"
-              margin="dense"
-            />
-          </div>
-          <div>
-            <FormControl variant="outlined" margin="dense" className={classes.formControl}>
-              <Select
-                native
-                classes={{
-                  root: classes.muiSelectRoot,
-                  icon: classes.muiSelectIcon,
-                }}
-                value={12}
-                // onChange={handleChange('age')}
-                input={(
-                  <OutlinedInput
-                    labelWidth={0}
-                    classes={{ notchedOutline: classes.muiOutlined }}
+                  設密碼
+                  <TextField
+                    placeholder="******"
+                    name="password"
+                    value={values.password}
+                    onChange={(event): void => {
+                      if (event.target.value) {
+                        // 下面這段可以成功改值 但是 checkbox 不會被切換 原因不明
+                        // setFieldValue('checked', true);
+                      }
+                      handleChange(event);
+                    }}
+                    onBlur={handleBlur}
+                    margin="dense"
                   />
-                )}
-              >
-                <option value={1}>公開</option>
-                <option value={2}>私密</option>
-              </Select>
-            </FormControl>
-          </div>
-          <div style={{ color: '#6A9955' }}>// 公開: 顯示在聊天大廳任何人都能加入</div>
-          <div style={{ color: '#6A9955' }}>// 私密: 只能用搜尋聊天室才能找到</div>
-          <div className={classes.buttonContainer}>
-            <Button color="primary">[確定]</Button>
-          </div>
+                </div>
+                <div>
+                  <FormControl variant="outlined" margin="dense" className={classes.formControl}>
+                    <Select
+                      native
+                      classes={{
+                        root: classes.muiSelectRoot,
+                        icon: classes.muiSelectIcon,
+                      }}
+                      name="isPrivate"
+                      value={values.isPrivate}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={!!(errors.isPrivate && touched.isPrivate && errors.isPrivate)}
+                      input={(
+                        <OutlinedInput
+                          labelWidth={0}
+                          classes={{ notchedOutline: classes.muiOutlined }}
+                        />
+                      )}
+                    >
+                      <option value={0}>公開</option>
+                      <option value={1}>私密</option>
+                    </Select>
+                  </FormControl>
+                </div>
+                <div style={{ color: '#6A9955' }}>// 公開: 顯示在聊天大廳任何人都能加入</div>
+                <div style={{ color: '#6A9955' }}>// 私密: 只能用搜尋聊天室才能找到</div>
+                <div className={classes.buttonContainer}>
+                  <Button type="submit" disabled={isSubmitting} color="primary">[確定]</Button>
+                </div>
+              </form>
+            )}
+          </Formik>
         </div>
       </Dialog>
     </>
