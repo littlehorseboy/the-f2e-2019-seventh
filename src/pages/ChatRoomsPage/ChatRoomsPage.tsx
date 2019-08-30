@@ -141,9 +141,29 @@ export default function ChatRoomsPage(): JSX.Element {
     state: storeTypes,
   ): ChatRoomsI['chatRooms'] => state.chatRoomsReducer.chatRooms);
 
-  const [recentChatRooms, setRecentChatRooms] = useState([]);
+  const [recentChatRooms, setRecentChatRooms] = useState<{ id: number; messages: string[] }[]>([]);
 
-  const [openChatRooms, setOpenChatRooms] = useState([]);
+  const [openChatRooms, setOpenChatRooms] = useState<{ id: number; messages: string[] }[]>([]);
+
+  const increaseRecentChatRoom = (id: number): void => {
+    setRecentChatRooms([
+      ...recentChatRooms,
+      {
+        id,
+        messages: [],
+      },
+    ]);
+  };
+
+  const increaseOpenChatRoom = (id: number): void => {
+    setOpenChatRooms([
+      ...openChatRooms,
+      {
+        id,
+        messages: [],
+      },
+    ]);
+  };
 
   return (
     <div className={classes.root}>
@@ -222,7 +242,7 @@ export default function ChatRoomsPage(): JSX.Element {
               </div>
 
               <div className={classes.chatRoomsContainer}>
-                <div>公開聊天室(10)</div>
+                <div>{`公開聊天室(${chatRooms.length})`}</div>
                 <List component="div">
                   {chatRooms.map((chatRoom): JSX.Element => (
                     <ListItem key={chatRoom.id} button>
@@ -238,60 +258,26 @@ export default function ChatRoomsPage(): JSX.Element {
               <div className={classes.chatRoomsContainer}>
                 <div>最近加入的聊天室(19)</div>
                 <List component="div">
-                  <ListItem button>
-                    <ListItemText primary="聊天室名字" />
-                    <ListItemSecondaryAction>
-                      1 / 2
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="聊天室名字" />
-                    <ListItemSecondaryAction>
-                      1 / 2
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="聊天室名字" />
-                    <ListItemSecondaryAction>
-                      1 / 2
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="聊天室名字" />
-                    <ListItemSecondaryAction>
-                      1 / 2
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="聊天室名字" />
-                    <ListItemSecondaryAction>
-                      1 / 2
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="聊天室名字" />
-                    <ListItemSecondaryAction>
-                      1 / 2
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="聊天室名字" />
-                    <ListItemSecondaryAction>
-                      1 / 2
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="聊天室名字" />
-                    <ListItemSecondaryAction>
-                      1 / 2
-                    </ListItemSecondaryAction>
-                  </ListItem>
+                  {chatRooms
+                    .filter((chatRoom): boolean => recentChatRooms
+                      .map((recentChatRoom): number => recentChatRoom.id).includes(chatRoom.id))
+                    .map((chatRoom): JSX.Element => (
+                      <ListItem key={chatRoom.id} button>
+                        <ListItemText primary={chatRoom.name} />
+                        <ListItemSecondaryAction>
+                          {`${chatRoom.people.length} / ${chatRoom.upperLimit}`}
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    ))}
                 </List>
               </div>
             </div>
 
             <div className={classes.newChatRoomContainer}>
-              <AddChatRoomButton />
+              <AddChatRoomButton
+                increaseRecentChatRoom={increaseRecentChatRoom}
+                increaseOpenChatRoom={increaseOpenChatRoom}
+              />
             </div>
           </>
         )}
@@ -321,7 +307,10 @@ export default function ChatRoomsPage(): JSX.Element {
               </Button>
             </div>
             <div>
-              <AddChatRoomButton />
+              <AddChatRoomButton
+                increaseRecentChatRoom={increaseRecentChatRoom}
+                increaseOpenChatRoom={increaseOpenChatRoom}
+              />
             </div>
           </div>
         </div>

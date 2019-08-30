@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import maxBy from 'lodash/maxBy';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
@@ -12,6 +13,7 @@ import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
 import { addChatRoom } from '../../actions/chatRooms/chatRooms';
 import { storeTypes } from '../../reducers/configureStore';
+import { ChatRoomsI } from '../../reducers/chatRooms/chatRooms';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const useStyles = makeStyles((theme) => createStyles({
@@ -65,9 +67,15 @@ const UASCatalogSchema = Yup.object().shape({
     .required('必填'),
 });
 
+interface PropsI {
+  increaseRecentChatRoom: (id: number) => void;
+  increaseOpenChatRoom: (id: number) => void;
+}
 
-export default function AddChatRoomButton(): JSX.Element {
+export default function AddChatRoomButton(props: PropsI): JSX.Element {
   const classes = useStyles();
+
+  const { increaseRecentChatRoom, increaseOpenChatRoom } = props;
 
   const [open, setOpen] = useState(false);
 
@@ -78,6 +86,10 @@ export default function AddChatRoomButton(): JSX.Element {
   function handleClose(): void {
     setOpen(false);
   }
+
+  const chatRooms = useSelector((
+    state: storeTypes,
+  ): ChatRoomsI['chatRooms'] => state.chatRoomsReducer.chatRooms);
 
   const name = useSelector((
     state: storeTypes,
@@ -114,6 +126,9 @@ export default function AddChatRoomButton(): JSX.Element {
             }}
             validationSchema={UASCatalogSchema}
             onSubmit={(values, actions): void => {
+              const calculateMaxId = maxBy(chatRooms, (chatRoom): number => chatRoom.id);
+              const newId = calculateMaxId ? calculateMaxId.id + 1 : 1;
+
               dispatch(addChatRoom(
                 values.name,
                 values.checked ? values.password : '',
@@ -121,6 +136,8 @@ export default function AddChatRoomButton(): JSX.Element {
                 values.upperLimit,
                 [name],
               ));
+              increaseRecentChatRoom(newId);
+              increaseOpenChatRoom(newId);
               actions.setSubmitting(false);
               handleClose();
             }}
