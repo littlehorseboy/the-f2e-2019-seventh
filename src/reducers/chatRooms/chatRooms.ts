@@ -84,7 +84,7 @@ const initState: ChatRoomsI = {
       password: '',
       isPrivate: false,
       upperLimit: 2,
-      people: ['Lucy'],
+      people: ['Lucy', 'Otis'],
     },
     {
       id: 10,

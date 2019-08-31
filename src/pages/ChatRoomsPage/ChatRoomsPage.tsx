@@ -10,6 +10,9 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import SearchIcon from '@material-ui/icons/Search';
@@ -137,13 +140,32 @@ export default function ChatRoomsPage(): JSX.Element {
     setSearchString(event.target.value);
   };
 
+  const loginName = useSelector((
+    state: storeTypes,
+  ): string => state.loginReducer.name);
+
+  const [tabValue, setTabValue] = React.useState(1);
+
+  function handleChangeTabValue(event: React.ChangeEvent<{}>, newValue: number): void {
+    setTabValue(newValue);
+  }
+
   const chatRooms = useSelector((
     state: storeTypes,
   ): ChatRoomsI['chatRooms'] => state.chatRoomsReducer.chatRooms);
 
   const [recentChatRooms, setRecentChatRooms] = useState<{ id: number; messages: string[] }[]>([]);
 
-  const [openChatRooms, setOpenChatRooms] = useState<{ id: number; messages: string[] }[]>([]);
+  const [openChatRooms, setOpenChatRooms] = useState<number[]>([]);
+
+  const increaseOpenChatRoom = (id: number): void => {
+    setOpenChatRooms([
+      ...openChatRooms,
+      id,
+    ]);
+
+    setTabValue(id);
+  };
 
   const increaseRecentChatRoom = (id: number): void => {
     setRecentChatRooms([
@@ -155,14 +177,19 @@ export default function ChatRoomsPage(): JSX.Element {
     ]);
   };
 
-  const increaseOpenChatRoom = (id: number): void => {
-    setOpenChatRooms([
-      ...openChatRooms,
-      {
-        id,
-        messages: [],
-      },
-    ]);
+  const pushRecentChatRoomMessages = (id: number, message: string): void => {
+    const foundRecentChatRoom = recentChatRooms
+      .find((chatRoom): boolean => chatRoom.id === id);
+
+    if (foundRecentChatRoom) {
+      foundRecentChatRoom.messages.push(message);
+
+      setRecentChatRooms([
+        ...recentChatRooms
+          .filter((chatRoom): boolean => chatRoom.id !== id),
+        foundRecentChatRoom,
+      ]);
+    }
   };
 
   return (
@@ -284,7 +311,7 @@ export default function ChatRoomsPage(): JSX.Element {
       </div>
 
       <div className={classes.main}>
-        <div className={classes.mainButtonContainer}>
+        {/* <div className={classes.mainButtonContainer}>
           <div>
             <div>ヽ(✿ﾟ▽ﾟ)ノ</div>
             <div>馬上開始你的聊天吧~</div>
@@ -313,6 +340,57 @@ export default function ChatRoomsPage(): JSX.Element {
               />
             </div>
           </div>
+        </div> */}
+        <AppBar position="static">
+          <Tabs value={tabValue} onChange={handleChangeTabValue} aria-label="tabs">
+            {openChatRooms.map((openChatRoomId): JSX.Element => {
+              const foundChatRoom = chatRooms
+                .find((chatRoom): boolean => chatRoom.id === openChatRoomId);
+              return (
+                <Tab
+                  key={openChatRoomId}
+                  value={openChatRoomId}
+                  label={foundChatRoom && foundChatRoom.name}
+                />
+              );
+            })}
+            <Tab label="Item One" />
+            <Tab label="Item Two" />
+            <Tab label="Item Three" />
+          </Tabs>
+        </AppBar>
+
+        {openChatRooms.map((openChatRoomId): JSX.Element => {
+          const foundRecentChatRoom = recentChatRooms
+            .find((chatRoom): boolean => chatRoom.id === openChatRoomId);
+          return (
+            <div
+              key={openChatRoomId}
+              hidden={tabValue !== openChatRoomId}
+            >
+              Item spec
+              {foundRecentChatRoom && foundRecentChatRoom.messages.map((message): JSX.Element => (
+                <div key={message}>{message}</div>
+              ))}
+
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={(): void => pushRecentChatRoomMessages(openChatRoomId, '123')}
+              >
+                123
+              </Button>
+            </div>
+          );
+        })}
+        <div hidden={tabValue !== 0}>
+          Item One
+        </div>
+        <div hidden={tabValue !== 1}>
+          Item Two
+        </div>
+        <div hidden={tabValue !== 2}>
+          Item Three
         </div>
       </div>
     </div>

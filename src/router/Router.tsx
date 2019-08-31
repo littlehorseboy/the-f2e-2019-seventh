@@ -1,10 +1,11 @@
 import React from 'react';
-import { HashRouter, Route } from 'react-router-dom';
+import { HashRouter, Route, Redirect } from 'react-router-dom';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import Login from '../pages/Login/Login';
 import ChatRoomsPage from '../pages/ChatRoomsPage/ChatRoomsPage';
 
 const routes = [
+  { from: '/', redirectTo: '/login' },
   { path: '/login', name: 'login', Component: Login },
   { path: '/chatRoom', name: 'chatRoom', Component: ChatRoomsPage },
   { path: '/chatRoom/:id', name: 'chatRoom', Component: ChatRoomsPage },
@@ -26,8 +27,13 @@ export default function Router(): JSX.Element {
   return (
     <HashRouter>
       <div className={classes.root}>
-        {routes.map(({ path, Component }): JSX.Element => (
-          <Route key={path} exact path={path} component={Component} />
+        {routes.map(({
+          path, Component, from, redirectTo,
+        }): JSX.Element => (
+          <>
+            {(from && redirectTo) && <Redirect from={from} to={redirectTo} />}
+            <Route key={path} exact path={path} component={Component} />
+          </>
         ))}
       </div>
     </HashRouter>
