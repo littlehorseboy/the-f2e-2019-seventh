@@ -19,6 +19,11 @@ import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import SearchIcon from '@material-ui/icons/Search';
 import CloseIcon from '@material-ui/icons/Close';
+import PersonIcon from '@material-ui/icons/Person';
+import LockIcon from '@material-ui/icons/Lock';
+import BuildIcon from '@material-ui/icons/Build';
+import AttachFileIcon from '@material-ui/icons/AttachFile';
+import PhotoIcon from '@material-ui/icons/Photo';
 import UsersSvgIcon from '../../components/icons/UsersSvgIcon/UsersSvgIcon';
 import AddChatRoomButton from '../../components/AddChatRoomButton/AddChatRoomButton';
 import { storeTypes } from '../../reducers/configureStore';
@@ -149,10 +154,56 @@ const useStyles = makeStyles((theme) => createStyles({
       flexGrow: 1,
     },
     '& > div:nth-child(2)': {
-      '& svg': {
-        fontSize: '1rem',
+      '& > div': {
+        display: 'flex',
+        alignItems: 'center',
+        '& svg': {
+          fontSize: '1rem',
+        },
       },
     },
+  },
+  messagesContainer: {
+    minHeight: 'calc(100vh - 48px)',
+    display: 'flex',
+    flexDirection: 'column',
+    '&.hide': {
+      display: 'none',
+    },
+    '& > div:first-child': {
+      height: 'calc(100vh - 48px - 240px)',
+      padding: theme.spacing(2),
+      overflowY: 'auto',
+    },
+    '& > div:nth-child(2)': {
+      height: 240,
+      display: 'flex',
+      flexDirection: 'column',
+      '& > div:nth-child(2)': {
+        padding: theme.spacing(2),
+      },
+    },
+  },
+  messageToolbar: {
+    backgroundColor: '#303030',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    '& > div': {
+      marginLeft: theme.spacing(2),
+      marginRight: theme.spacing(),
+      paddingTop: theme.spacing(0.5),
+      paddingBottom: theme.spacing(0.5),
+      display: 'flex',
+      alignItems: 'center',
+    },
+  },
+  messageTextArea: {
+    flexGrow: 1,
+  },
+  messageTextAreaButtons: {
+    display: 'flex',
+    justifyContent: 'space-between',
   },
 }));
 
@@ -215,15 +266,6 @@ export default function ChatRoomsPage(): JSX.Element {
     }
   };
 
-  const increaseOpenChatRoom = (id: number): void => {
-    setOpenChatRooms([
-      ...openChatRooms,
-      id,
-    ]);
-
-    setTabValue(id);
-  };
-
   const decreaseOpenChatRoom = (id: number): void => {
     setOpenChatRooms(
       openChatRooms.filter((openChatRoomId): boolean => openChatRoomId !== id),
@@ -250,6 +292,25 @@ export default function ChatRoomsPage(): JSX.Element {
         }],
       },
     ]);
+  };
+
+  const openChatRoom = (id: number): void => {
+    const foundRecentChatRoom = recentChatRooms
+      .find((chatRoom): boolean => chatRoom.id === id);
+    if (!foundRecentChatRoom) {
+      increaseRecentChatRoom(id);
+    }
+
+    const foundOpenChatRoom = openChatRooms
+      .find((openChatRoomId): boolean => openChatRoomId === id);
+    if (!foundOpenChatRoom) {
+      setOpenChatRooms([
+        ...openChatRooms,
+        id,
+      ]);
+    }
+
+    setTabValue(id);
   };
 
   return (
@@ -332,7 +393,11 @@ export default function ChatRoomsPage(): JSX.Element {
                 <div>{`公開聊天室(${chatRooms.length})`}</div>
                 <List component="div">
                   {chatRooms.map((chatRoom): JSX.Element => (
-                    <ListItem key={chatRoom.id} button>
+                    <ListItem
+                      key={chatRoom.id}
+                      button
+                      onClick={(): void => openChatRoom(chatRoom.id)}
+                    >
                       <ListItemText primary={chatRoom.name} />
                       <ListItemSecondaryAction>
                         {`${chatRoom.people.length} / ${chatRoom.upperLimit}`}
@@ -343,13 +408,17 @@ export default function ChatRoomsPage(): JSX.Element {
               </div>
 
               <div className={classes.chatRoomsContainer}>
-                <div>最近加入的聊天室(19)</div>
+                <div>{`最近加入的聊天室(${recentChatRooms.length})`}</div>
                 <List component="div">
                   {chatRooms
                     .filter((chatRoom): boolean => recentChatRooms
                       .map((recentChatRoom): number => recentChatRoom.id).includes(chatRoom.id))
                     .map((chatRoom): JSX.Element => (
-                      <ListItem key={chatRoom.id} button>
+                      <ListItem
+                        key={chatRoom.id}
+                        button
+                        onClick={(): void => openChatRoom(chatRoom.id)}
+                      >
                         <ListItemText primary={chatRoom.name} />
                         <ListItemSecondaryAction>
                           {`${chatRoom.people.length} / ${chatRoom.upperLimit}`}
@@ -363,7 +432,7 @@ export default function ChatRoomsPage(): JSX.Element {
             <div className={classes.newChatRoomContainer}>
               <AddChatRoomButton
                 increaseRecentChatRoom={increaseRecentChatRoom}
-                increaseOpenChatRoom={increaseOpenChatRoom}
+                openChatRoom={openChatRoom}
               />
             </div>
           </>
@@ -371,108 +440,166 @@ export default function ChatRoomsPage(): JSX.Element {
       </div>
 
       <div className={classes.main}>
-        {/* <div className={classes.mainButtonContainer}>
-          <div>
-            <div>ヽ(✿ﾟ▽ﾟ)ノ</div>
-            <div>馬上開始你的聊天吧~</div>
-            <div>
-              <Button
-                color="primary"
-                variant="outlined"
-                fullWidth
-              >
-                隨機1對1配對
-              </Button>
+        {openChatRooms.length === 0
+          ? (
+            <div className={classes.mainButtonContainer}>
+              <div>
+                <div>ヽ(✿ﾟ▽ﾟ)ノ</div>
+                <div>馬上開始你的聊天吧~</div>
+                <div>
+                  <Button
+                    color="primary"
+                    variant="outlined"
+                    fullWidth
+                  >
+                    隨機1對1配對
+                  </Button>
+                </div>
+                <div>
+                  <Button
+                    color="primary"
+                    variant="outlined"
+                    fullWidth
+                  >
+                    隨機進入群組
+                  </Button>
+                </div>
+                <div>
+                  <AddChatRoomButton
+                    increaseRecentChatRoom={increaseRecentChatRoom}
+                    openChatRoom={openChatRoom}
+                  />
+                </div>
+              </div>
             </div>
-            <div>
-              <Button
-                color="primary"
-                variant="outlined"
-                fullWidth
-              >
-                隨機進入群組
-              </Button>
-            </div>
-            <div>
-              <AddChatRoomButton
-                increaseRecentChatRoom={increaseRecentChatRoom}
-                increaseOpenChatRoom={increaseOpenChatRoom}
-              />
-            </div>
-          </div>
-        </div> */}
-        <AppBar position="static">
-          <Tabs
-            className={classes.tabs}
-            value={tabValue}
-            onChange={handleChangeTabValue}
-            aria-label="tabs"
-          >
-            {tabValue && openChatRooms.map((openChatRoomId): JSX.Element => {
-              const foundChatRoom = chatRooms
-                .find((chatRoom): boolean => chatRoom.id === openChatRoomId);
-              return (
-                <Tab
-                  key={openChatRoomId}
-                  value={openChatRoomId}
-                  label={foundChatRoom && (
-                    <div className={classes.tabLabel}>
-                      <div>
-                        {foundChatRoom.name}
+          )
+          : (
+            <>
+              <AppBar position="static">
+                <Tabs
+                  className={classes.tabs}
+                  value={tabValue}
+                  onChange={handleChangeTabValue}
+                  aria-label="tabs"
+                >
+                  {tabValue && openChatRooms.map((openChatRoomId): JSX.Element => {
+                    const foundChatRoom = chatRooms
+                      .find((chatRoom): boolean => chatRoom.id === openChatRoomId);
+                    return (
+                      <Tab
+                        key={openChatRoomId}
+                        value={openChatRoomId}
+                        label={foundChatRoom && (
+                          <div className={classes.tabLabel}>
+                            <div>
+                              {foundChatRoom.name}
+                            </div>
+                            <div>
+                              <div
+                                role="button"
+                                tabIndex={0}
+                                onClick={(): void => decreaseOpenChatRoom(openChatRoomId)}
+                                onKeyPress={(): void => decreaseOpenChatRoom(openChatRoomId)}
+                              >
+                                <CloseIcon />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      />
+                    );
+                  })}
+                </Tabs>
+              </AppBar>
+
+              {openChatRooms.map((openChatRoomId): JSX.Element => {
+                const foundRecentChatRoom = recentChatRooms
+                  .find((chatRoom): boolean => chatRoom.id === openChatRoomId);
+                return (
+                  <div
+                    key={openChatRoomId}
+                    className={classNames(
+                      classes.messagesContainer,
+                      { hide: tabValue !== openChatRoomId },
+                    )}
+                  >
+                    <div>
+                      {foundRecentChatRoom && foundRecentChatRoom.messages
+                        .map((message): JSX.Element => (
+                          /* eslint-disable react/no-danger */
+                          <div
+                            key={message.id}
+                            dangerouslySetInnerHTML={{
+                              __html: message.message,
+                            }}
+                          />
+                          /* eslint-enable */
+                        ))}
+                    </div>
+
+                    <div>
+                      <div className={classes.messageToolbar}>
+                        <div>
+                          <PersonIcon />
+                          1 / 2
+                        </div>
+                        <div>
+                          <LockIcon />
+                          私密
+                        </div>
+                        <div>
+                          <BuildIcon />
+                        </div>
                       </div>
-                      <div>
-                        <div
-                          role="button"
-                          tabIndex={0}
-                          onClick={(): void => decreaseOpenChatRoom(openChatRoomId)}
-                          onKeyPress={(): void => decreaseOpenChatRoom(openChatRoomId)}
-                        >
-                          <CloseIcon />
+
+                      <div className={classes.messageTextArea}>
+                        <div>
+                          {`${loginName} >`}
+                          <TextField
+                            multiline
+                            rows="3"
+                            className={classes.textField}
+                            variant="outlined"
+                            fullWidth
+                          />
+                        </div>
+                      </div>
+                      <div className={classes.messageTextAreaButtons}>
+                        <div>
+                          <Button
+                            color="primary"
+                            onClick={(): void => pushRecentChatRoomMessages(openChatRoomId, '夾帶附件，未實作')}
+                          >
+                            <AttachFileIcon />
+                          </Button>
+                          <Button
+                            color="primary"
+                            onClick={(): void => pushRecentChatRoomMessages(openChatRoomId, '照片上傳，未實作')}
+                          >
+                            <PhotoIcon />
+                          </Button>
+                          <Button
+                            color="primary"
+                            onClick={(): void => pushRecentChatRoomMessages(openChatRoomId, '(ﾟ∀ﾟ)')}
+                          >
+                            (ﾟ∀ﾟ)
+                          </Button>
+                        </div>
+                        <div>
+                          <Button
+                            color="primary"
+                            onClick={(): void => pushRecentChatRoomMessages(openChatRoomId, '123')}
+                          >
+                            傳送
+                          </Button>
                         </div>
                       </div>
                     </div>
-                  )}
-                />
-              );
-            })}
-          </Tabs>
-        </AppBar>
-
-        {openChatRooms.map((openChatRoomId): JSX.Element => {
-          const foundRecentChatRoom = recentChatRooms
-            .find((chatRoom): boolean => chatRoom.id === openChatRoomId);
-          return (
-            <div
-              key={openChatRoomId}
-              hidden={tabValue !== openChatRoomId}
-            >
-              <div>
-                {foundRecentChatRoom && foundRecentChatRoom.messages.map((message): JSX.Element => (
-                  /* eslint-disable react/no-danger */
-                  <div
-                    key={message.id}
-                    dangerouslySetInnerHTML={{
-                      __html: message.message,
-                    }}
-                  />
-                  /* eslint-enable */
-                ))}
-              </div>
-              Item spec
-              {foundRecentChatRoom && foundRecentChatRoom.messages.map((message): JSX.Element => (
-                <div key={message.id}>{message.message}</div>
-              ))}
-
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={(): void => pushRecentChatRoomMessages(openChatRoomId, '123')}
-              >
-                123
-              </Button>
-            </div>
-          );
-        })}
+                  </div>
+                );
+              })}
+            </>
+          )}
       </div>
     </div>
   );

@@ -69,13 +69,13 @@ const UASCatalogSchema = Yup.object().shape({
 
 interface PropsI {
   increaseRecentChatRoom: (id: number) => void;
-  increaseOpenChatRoom: (id: number) => void;
+  openChatRoom: (id: number) => void;
 }
 
 export default function AddChatRoomButton(props: PropsI): JSX.Element {
   const classes = useStyles();
 
-  const { increaseRecentChatRoom, increaseOpenChatRoom } = props;
+  const { increaseRecentChatRoom, openChatRoom } = props;
 
   const [open, setOpen] = useState(false);
 
@@ -137,7 +137,7 @@ export default function AddChatRoomButton(props: PropsI): JSX.Element {
                 [name],
               ));
               increaseRecentChatRoom(newId);
-              increaseOpenChatRoom(newId);
+              openChatRoom(newId);
               actions.setSubmitting(false);
               handleClose();
             }}
