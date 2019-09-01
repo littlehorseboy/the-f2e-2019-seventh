@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
+import { format } from 'date-fns';
+import uuidv4 from 'uuid/v4';
 import classNames from 'classnames';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
@@ -16,6 +18,7 @@ import Tab from '@material-ui/core/Tab';
 import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import SearchIcon from '@material-ui/icons/Search';
+import CloseIcon from '@material-ui/icons/Close';
 import UsersSvgIcon from '../../components/icons/UsersSvgIcon/UsersSvgIcon';
 import AddChatRoomButton from '../../components/AddChatRoomButton/AddChatRoomButton';
 import { storeTypes } from '../../reducers/configureStore';
@@ -127,7 +130,41 @@ const useStyles = makeStyles((theme) => createStyles({
       },
     },
   },
+  tabs: {
+    backgroundColor: '#303030',
+    color: '#D4D4D4',
+    '& .MuiTab-root': {
+      paddingLeft: theme.spacing(0.5),
+      paddingRight: theme.spacing(0.5),
+    },
+    '& .MuiTab-root.Mui-selected': {
+      backgroundColor: '#1E1E1E',
+    },
+  },
+  tabLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+    '& > div:first-child': {
+      flexGrow: 1,
+    },
+    '& > div:nth-child(2)': {
+      '& svg': {
+        fontSize: '1rem',
+      },
+    },
+  },
 }));
+
+interface RecentChatRoomI {
+  id: number;
+  messages: {
+    id: string;
+    name: string;
+    message: string;
+    sendTime: Date;
+  }[];
+}
 
 export default function ChatRoomsPage(): JSX.Element {
   const classes = useStyles();
@@ -144,7 +181,7 @@ export default function ChatRoomsPage(): JSX.Element {
     state: storeTypes,
   ): string => state.loginReducer.name);
 
-  const [tabValue, setTabValue] = React.useState(1);
+  const [tabValue, setTabValue] = React.useState<number | null>(null);
 
   function handleChangeTabValue(event: React.ChangeEvent<{}>, newValue: number): void {
     setTabValue(newValue);
@@ -154,9 +191,29 @@ export default function ChatRoomsPage(): JSX.Element {
     state: storeTypes,
   ): ChatRoomsI['chatRooms'] => state.chatRoomsReducer.chatRooms);
 
-  const [recentChatRooms, setRecentChatRooms] = useState<{ id: number; messages: string[] }[]>([]);
+  const [recentChatRooms, setRecentChatRooms] = useState<RecentChatRoomI[]>([]);
 
   const [openChatRooms, setOpenChatRooms] = useState<number[]>([]);
+
+  const pushRecentChatRoomMessages = (id: number, message: string): void => {
+    const foundRecentChatRoom = recentChatRooms
+      .find((chatRoom): boolean => chatRoom.id === id);
+
+    if (foundRecentChatRoom) {
+      foundRecentChatRoom.messages.push({
+        id: uuidv4(),
+        name: loginName,
+        message,
+        sendTime: new Date(),
+      });
+
+      setRecentChatRooms([
+        ...recentChatRooms
+          .filter((chatRoom): boolean => chatRoom.id !== id),
+        foundRecentChatRoom,
+      ]);
+    }
+  };
 
   const increaseOpenChatRoom = (id: number): void => {
     setOpenChatRooms([
@@ -167,29 +224,32 @@ export default function ChatRoomsPage(): JSX.Element {
     setTabValue(id);
   };
 
+  const decreaseOpenChatRoom = (id: number): void => {
+    setOpenChatRooms(
+      openChatRooms.filter((openChatRoomId): boolean => openChatRoomId !== id),
+    );
+
+    setTabValue(null);
+  };
+
   const increaseRecentChatRoom = (id: number): void => {
     setRecentChatRooms([
       ...recentChatRooms,
       {
         id,
-        messages: [],
+        messages: [{
+          id: uuidv4(),
+          name: loginName,
+          message: `
+            <span style="color: #6C6C6C;">${format(new Date(), 'yyyy-MM-dd HH:mm:ss')}</span>
+            <span style="color: #6C6C6C;"><</span><span style="color: #499CD6;">link</span>
+            <span style="color: #9CDCFE;">rel</span><span>=</span><span style="color: #CE9178;">"random"</span>
+            <span style="color: #9CDCFE;">href</span><span>=</span><span style="color: #CE9178;">"${loginName}已進入聊天室"</span><span>></span>
+          `,
+          sendTime: new Date(),
+        }],
       },
     ]);
-  };
-
-  const pushRecentChatRoomMessages = (id: number, message: string): void => {
-    const foundRecentChatRoom = recentChatRooms
-      .find((chatRoom): boolean => chatRoom.id === id);
-
-    if (foundRecentChatRoom) {
-      foundRecentChatRoom.messages.push(message);
-
-      setRecentChatRooms([
-        ...recentChatRooms
-          .filter((chatRoom): boolean => chatRoom.id !== id),
-        foundRecentChatRoom,
-      ]);
-    }
   };
 
   return (
@@ -342,21 +402,39 @@ export default function ChatRoomsPage(): JSX.Element {
           </div>
         </div> */}
         <AppBar position="static">
-          <Tabs value={tabValue} onChange={handleChangeTabValue} aria-label="tabs">
-            {openChatRooms.map((openChatRoomId): JSX.Element => {
+          <Tabs
+            className={classes.tabs}
+            value={tabValue}
+            onChange={handleChangeTabValue}
+            aria-label="tabs"
+          >
+            {tabValue && openChatRooms.map((openChatRoomId): JSX.Element => {
               const foundChatRoom = chatRooms
                 .find((chatRoom): boolean => chatRoom.id === openChatRoomId);
               return (
                 <Tab
                   key={openChatRoomId}
                   value={openChatRoomId}
-                  label={foundChatRoom && foundChatRoom.name}
+                  label={foundChatRoom && (
+                    <div className={classes.tabLabel}>
+                      <div>
+                        {foundChatRoom.name}
+                      </div>
+                      <div>
+                        <div
+                          role="button"
+                          tabIndex={0}
+                          onClick={(): void => decreaseOpenChatRoom(openChatRoomId)}
+                          onKeyPress={(): void => decreaseOpenChatRoom(openChatRoomId)}
+                        >
+                          <CloseIcon />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 />
               );
             })}
-            <Tab label="Item One" />
-            <Tab label="Item Two" />
-            <Tab label="Item Three" />
           </Tabs>
         </AppBar>
 
@@ -368,9 +446,21 @@ export default function ChatRoomsPage(): JSX.Element {
               key={openChatRoomId}
               hidden={tabValue !== openChatRoomId}
             >
+              <div>
+                {foundRecentChatRoom && foundRecentChatRoom.messages.map((message): JSX.Element => (
+                  /* eslint-disable react/no-danger */
+                  <div
+                    key={message.id}
+                    dangerouslySetInnerHTML={{
+                      __html: message.message,
+                    }}
+                  />
+                  /* eslint-enable */
+                ))}
+              </div>
               Item spec
               {foundRecentChatRoom && foundRecentChatRoom.messages.map((message): JSX.Element => (
-                <div key={message}>{message}</div>
+                <div key={message.id}>{message.message}</div>
               ))}
 
               <Button
@@ -383,15 +473,6 @@ export default function ChatRoomsPage(): JSX.Element {
             </div>
           );
         })}
-        <div hidden={tabValue !== 0}>
-          Item One
-        </div>
-        <div hidden={tabValue !== 1}>
-          Item Two
-        </div>
-        <div hidden={tabValue !== 2}>
-          Item Three
-        </div>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import React from 'react';
 import { HashRouter, Route, Redirect } from 'react-router-dom';
+import uuidv4 from 'uuid/v4';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import Login from '../pages/Login/Login';
 import ChatRoomsPage from '../pages/ChatRoomsPage/ChatRoomsPage';
@@ -30,10 +31,10 @@ export default function Router(): JSX.Element {
         {routes.map(({
           path, Component, from, redirectTo,
         }): JSX.Element => (
-          <>
+          <React.Fragment key={uuidv4()}>
             {(from && redirectTo) && <Redirect from={from} to={redirectTo} />}
-            <Route key={path} exact path={path} component={Component} />
-          </>
+            <Route exact path={path} component={Component} />
+          </React.Fragment>
         ))}
       </div>
     </HashRouter>
