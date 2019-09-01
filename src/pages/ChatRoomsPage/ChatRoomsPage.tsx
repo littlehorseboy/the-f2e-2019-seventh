@@ -313,6 +313,12 @@ export default function ChatRoomsPage(): JSX.Element {
     setTabValue(id);
   };
 
+  const [sendMessage, setSendMessage] = useState('');
+
+  const handleChangeSendMessage = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    setSendMessage(event.target.value);
+  };
+
   return (
     <div className={classes.root}>
       <div className={classNames(classes.sideBar, { hide: sideBarVisible })}>
@@ -561,6 +567,8 @@ export default function ChatRoomsPage(): JSX.Element {
                             className={classes.textField}
                             variant="outlined"
                             fullWidth
+                            value={sendMessage}
+                            onChange={handleChangeSendMessage}
                           />
                         </div>
                       </div>
@@ -588,7 +596,15 @@ export default function ChatRoomsPage(): JSX.Element {
                         <div>
                           <Button
                             color="primary"
-                            onClick={(): void => pushRecentChatRoomMessages(openChatRoomId, '123')}
+                            onClick={(): void => {
+                              pushRecentChatRoomMessages(openChatRoomId, `
+                                <span style="color: #6C6C6C;">${format(new Date(), 'yyyy-MM-dd HH:mm:ss')}</span>
+                                <span style="color: #6C6C6C;"><</span><span style="color: #499CD6;">${loginName}</span><span style="color: #6C6C6C;">></span><br />
+                                <span style="margin-left: 20px;">${sendMessage}</span><br />
+                                <span style="color: #6C6C6C;"><</span><span style="color: #499CD6;">${loginName}</span><span style="color: #6C6C6C;">/></span><br />
+                              `);
+                              setSendMessage('');
+                            }}
                           >
                             傳送
                           </Button>
