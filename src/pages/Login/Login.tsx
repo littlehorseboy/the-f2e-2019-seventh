@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => createStyles({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    '& > *': {
+    '& button': {
       fontSize: '1rem',
       margin: theme.spacing(),
     },
